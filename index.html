@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedra, Papel, Tesoura - Web Game</title>
+    <style>
+        :root {
+            --primary: #2a3556;
+            --bg-gradient: linear-gradient(135deg, #1a1f33 0%, #2a3556 100%);
+            --rock: #3498db;
+            --paper: #f1c40f;
+            --scissors: #e74c3c;
+            --text: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        h1 { margin-bottom: 2rem; letter-spacing: 2px; }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Colunas de Jogadores */
+        .player-panel {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+        }
+
+        .score { font-size: 2.5rem; font-weight: bold; margin: 10px 0; }
+
+        /* Botões de Escolha */
+        .choices { display: flex; flex-direction: column; gap: 10px; }
+
+        .btn-choice {
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-choice:hover { transform: scale(1.05); opacity: 0.9; }
+        .rock { background-color: var(--rock); }
+        .paper { background-color: var(--paper); color: #333; }
+        .scissors { background-color: var(--scissors); }
+
+        /* Centro do Jogo */
+        .vs-display { font-size: 1.2rem; }
+        .result-text {
+            height: 50px;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+
+        .controls {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-ui {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-ui:hover { background: white; color: var(--primary); }
+
+        @media (max-width: 600px) {
+            .game-area { grid-template-columns: 1fr; }
+            .vs-display { order: -1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>PEDRA, PAPEL, TESOURA</h1>
+
+    <div class="game-area">
+        <div class="player-panel">
+            <h3>VOCÊ</h3>
+            <div class="score" id="user-score">0</div>
+            <div class="choices">
+                <button class="btn-choice rock" onclick="play('pedra')">✊ PEDRA</button>
+                <button class="btn-choice paper" onclick="play('papel')">✋ PAPEL</button>
+                <button class="btn-choice scissors" onclick="play('tesoura')">✌️ TESOURA</button>
+            </div>
+        </div>
+
+        <div class="vs-display">
+            <div>RODADA ANTERIOR:</div>
+            <div id="last-round" style="font-size: 0.9rem; opacity: 0.8;">Aguardando...</div>
+            <div class="result-text" id="result-msg">Faça sua jogada!</div>
+        </div>
+
+        <div class="player-panel">
+            <h3>COMPUTADOR</h3>
+            <div class="score" id="comp-score">0</div>
+            <div id="comp-choice-display" style="font-size: 3rem; margin-top: 20px;">🤖</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-ui" onclick="resetGame()">NOVO JOGO</button>
+    </div>
+</div>
+
+<script>
+    let userScore = 0;
+    let compScore = 0;
+
+    const icons = {
+        'pedra': '✊',
+        'papel': '✋',
+        'tesoura': '✌️'
+    };
+
+    function play(userChoice) {
+        const options = ['pedra', 'papel', 'tesoura'];
+        const compChoice = options[Math.floor(Math.random() * 3)];
+        
+        // Atualiza ícone do robô
+        document.getElementById('comp-choice-display').innerText = icons[compChoice];
+          let result = "";
+       if(userChoice=== compChoice){
+           result="EMPATE";
+       document.getElementById('result-msg').style.color = "white";
+     
+ }else if((userChoice === 'pedra' && compChoice === 'tesoura') ||
+        (userChoice === 'papel' && compChoice === 'pedra') ||
+        (userChoice === 'tesoura' && compChoice === 'papel')
+      ){
+         result="Você GANHOU!"
+        document.getElementById('result-msg').style.color = "#2ecc71";
+          userScore++;
+      }else{
+           result="Você PERDEU!"
+           compScore++;
+         document.getElementById('result-msg').style.color = "#ff7675";
+        
+      }
+
+
+
+
+        // Atualiza Interface
+        document.getElementById('user-score').innerText = userScore;
+        document.getElementById('comp-score').innerText = compScore;
+        document.getElementById('result-msg').innerText = result;
+        document.getElementById('last-round').innerText = `${userChoice.toUpperCase()} vs ${compChoice.toUpperCase()}`;
+    }
+
+    function resetGame() {
+        userScore = 0;
+        compScore = 0;
+        document.getElementById('user-score').innerText = "0";
+        document.getElementById('comp-score').innerText = "0";
+        document.getElementById('result-msg').innerText = "Faça sua jogada!";
+        document.getElementById('result-msg').style.color = "white";
+        document.getElementById('comp-choice-display').innerText = "🤖";
+        document.getElementById('last-round').innerText = "Aguardando...";
+    }
+</script>
+
+</body>
+</html>
